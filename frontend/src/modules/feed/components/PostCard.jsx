@@ -1,30 +1,58 @@
-import React from "react";
+import api from "../../../services/apiClient";
+import { useAuth } from "../../../context/AuthContext";
 
-// TODO: Add media, tags, comments integration
-const PostCard = ({ post }) => {
+export default function PostCard({ post, onDelete }) {
+  const { user } = useAuth();
+
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm("Delete this post?");
+    if (!confirmDelete) return;
+
+    await api.delete(`/feed/${post._id}`);
+    onDelete();
+  };
+
   return (
-    <article className="bg-white rounded-2xl shadow-sm border border-slate-200 p-3">
-      <header className="flex items-center gap-3 mb-2">
-        <div className="w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center text-xs">
-          {post.author[0]}
-        </div>
+    <div className="p-4 border rounded bg-white shadow">
+      {/* PROFILE INFO */}
+      <div className="flex items-center gap-3">
+        <img
+          src={post.postedBy.avatar || "/default-avatar.png"}
+          className="w-10 h-10 rounded-full"
+        />
         <div>
-          <div className="text-sm font-semibold">{post.author}</div>
-          <div className="text-[11px] text-slate-500">{post.role}</div>
+          <p className="font-semibold">{post.postedBy.name}</p>
+          <p className="text-xs text-gray-500">{post.postedBy.role}</p>
         </div>
-      </header>
-      <div className="text-sm text-slate-800 mb-3">{post.content}</div>
-      <footer className="flex items-center justify-between text-xs text-slate-500">
-        <div className="flex gap-4">
-          <button>👍 Like</button>
-          <button>💬 Comment</button>
-          <button>🔗 Share</button>
-          <button>🔖 Save</button>
-        </div>
-        <div>{post.likes || 0} likes</div>
-      </footer>
-    </article>
-  );
-};
+      </div>
 
-export default PostCard;
+      {/* POST TEXT */}
+      <p className="mt-3">{post.text}</p>
+
+      {/* MEDIA */}
+      {post.media?.map((m, i) => (
+        <div key={i}>
+          {m.type === "image" && (
+            <img src={m.url} className="mt-3 rounded" />
+          )}
+
+          {m.type === "video" && (
+            <video controls className="mt-3 rounded">
+              <source src={m.url} />
+            </video>
+          )}
+        </div>
+      ))}
+
+      {/* DELETE ONLY IF USER IS OWNER */}
+      {(user?._id === post.postedBy._id || user?.role === "admin") && (
+        <button
+          onClick={handleDelete}
+          className="mt-4 text-red-600 text-sm"
+        >
+          Delete
+        </button>
+      )}
+    </div>
+  );
+}

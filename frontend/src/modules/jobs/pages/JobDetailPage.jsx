@@ -1,40 +1,40 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import JobMatchWidget from "../components/JobMatchWidget.jsx";
+import api from "../../../services/apiClient";
+import JobMatchWidget from "../components/JobMatchWidget";
 
-// TODO: Fetch job details from API
-const dummyJob = {
-  id: 1,
-  title: "React Intern",
-  company: "TechCorp",
-  location: "Mumbai",
-  type: "Internship",
-  description: "Work with React, Redux, and Tailwind to build amazing apps.",
-  postedAgo: "2d",
-};
+export default function JobDetailPage() {
+  const { id } = useParams();
+  const [job, setJob] = useState(null);
 
-const JobDetailPage = () => {
-  const { jobId } = useParams();
-  // TODO: Fetch job by jobId
+  useEffect(() => {
+    api.get(`/jobs/${id}`).then((res) => setJob(res.data.data));
+  }, [id]);
 
-  const job = dummyJob;
+  if (!job) return <p className="p-4">Loading...</p>;
+
+  const handleApply = () => {
+    api.post(`/jobs/${id}/apply`, { resume: "resume.pdf" });
+    alert("Applied Successfully!");
+  };
 
   return (
-    <div className="space-y-4">
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-        <header className="flex justify-between items-center mb-2">
-          <h2 className="text-lg font-semibold">{job.title}</h2>
-          <span className="text-xs text-slate-500">{job.type}</span>
-        </header>
-        <p className="text-sm text-slate-700">{job.company} - {job.location}</p>
-        <p className="text-sm text-slate-600 mt-2">{job.description}</p>
-      </div>
-      <JobMatchWidget matchScore={75} />
-      <button className="px-4 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700">
+    <div className="max-w-3xl mx-auto p-4 space-y-6">
+      <h1 className="text-3xl font-bold">{job.title}</h1>
+      <p className="text-lg text-gray-600">{job.company}</p>
+      <p className="text-gray-500">{job.location}</p>
+
+      <h2 className="font-semibold text-lg mt-4">Description</h2>
+      <p>{job.description}</p>
+
+      <JobMatchWidget jobSkills={job.skills} />
+
+      <button
+        onClick={handleApply}
+        className="px-4 py-2 bg-blue-600 text-white rounded"
+      >
         Apply Now
       </button>
     </div>
   );
-};
-
-export default JobDetailPage;
+}

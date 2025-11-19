@@ -1,26 +1,24 @@
-import React from "react";
 import { Link } from "react-router-dom";
 
-const JobCard = ({ job }) => {
+export default function JobCard({ job }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 hover:shadow-md transition">
-      <header className="flex justify-between items-center mb-2">
-        <h3 className="text-sm font-semibold text-slate-800">{job.title}</h3>
-        <span className="text-[10px] text-slate-500">{job.type}</span>
-      </header>
-      <p className="text-xs text-slate-600 mb-2">{job.company}</p>
-      <p className="text-xs text-slate-500 mb-3">{job.location}</p>
-      <div className="flex justify-between items-center">
-        <Link
-          to={`/jobs/${job.id}`}
-          className="text-xs text-indigo-600 hover:underline"
-        >
-          View Details
-        </Link>
-        <span className="text-[10px] text-slate-400">{job.postedAgo}</span>
-      </div>
-    </div>
-  );
-};
+    <Link to={`/jobs/${job._id}`}>
+      <div className="p-4 border rounded bg-white shadow hover:shadow-lg transition cursor-pointer">
+        <h3 className="font-bold text-xl">{job.title}</h3>
+        <p className="text-gray-600">{job.company}</p>
+        <p className="text-gray-400">{job.location}</p>
 
-export default JobCard;
+        <div className="flex gap-2 mt-3">
+          {job.skills?.slice(0, 3).map((skill) => (
+            <span
+              key={skill}
+              className="px-2 py-1 bg-blue-100 text-blue-600 rounded text-xs"
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
+      </div>
+    </Link>
+  );
+}

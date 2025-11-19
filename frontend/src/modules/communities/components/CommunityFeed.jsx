@@ -1,35 +1,49 @@
-import React from "react";
+import { useState } from "react";
+import api from "../../../services/apiClient";
 
-// TODO: Replace with API
-const dummyPosts = [
-  { id: 1, author: "Alumni A", content: "Welcome to our community!", likes: 12 },
-  { id: 2, author: "Student B", content: "Looking for project partners", likes: 5 },
-];
+export default function CommunityFeed({ community, reload }) {
+  const [text, setText] = useState("");
 
-const CommunityFeed = () => {
+  const handlePost = async () => {
+    if (!text.trim()) return alert("Write something!");
+
+    await api.post(`/communities/${community._id}/post`, {
+      channel: "general",
+      text,
+    });
+
+    setText("");
+    reload();
+  };
+
   return (
-    <div className="space-y-4">
-      {dummyPosts.map((post) => (
-        <div
-          key={post.id}
-          className="bg-white rounded-2xl shadow-sm border border-slate-200 p-3"
+    <div className="flex-1 space-y-4">
+      <h1 className="text-2xl font-bold">{community.name}</h1>
+
+      {/* New post textarea */}
+      <div className="p-4 bg-white border rounded">
+        <textarea
+          placeholder="Share something to the community..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          className="w-full border p-2 rounded"
+        />
+
+        <button
+          onClick={handlePost}
+          className="mt-3 bg-blue-600 text-white px-4 py-2 rounded"
         >
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs">
-              {post.author[0]}
-            </div>
-            <span className="text-sm font-semibold text-slate-800">{post.author}</span>
-          </div>
-          <p className="text-sm text-slate-700 mb-2">{post.content}</p>
-          <div className="flex gap-4 text-xs text-slate-500">
-            <button>👍 Like</button>
-            <button>💬 Comment</button>
-            <button>🔗 Share</button>
-          </div>
+          Post
+        </button>
+      </div>
+
+      {/* Posts Display */}
+      {community.posts?.map((post) => (
+        <div key={post._id} className="p-4 bg-white border rounded shadow">
+          <p className="font-semibold text-blue-700">{post.user?.name}</p>
+          <p className="mt-1">{post.text}</p>
         </div>
       ))}
     </div>
   );
-};
-
-export default CommunityFeed;
+}

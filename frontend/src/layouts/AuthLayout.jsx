@@ -1,16 +1,8 @@
-// src/layouts/AuthLayout.jsx
-import React from "react";
-
-// AuthLayout: Used for Login/Register pages
-// Provides centered card layout
-const AuthLayout = ({ children }) => {
+// frontend/src/layouts/AuthLayout.jsx
+export default function AuthLayout({ children }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
-        {children}
-      </div>
+    <div style={{ minHeight: "100vh", display: "grid", placeItems: "center" }}>
+      <div>{children}</div>
     </div>
   );
-};
-
-export default AuthLayout;
+}

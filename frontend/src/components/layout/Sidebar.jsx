@@ -1,40 +1,84 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx";
-import { sidebarLinksByRole } from "../../utils/roleConfig.js";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
-const Sidebar = () => {
+export default function Sidebar() {
   const { user } = useAuth();
-  if (!user) return null;
+  const location = useLocation();
 
-  const links = sidebarLinksByRole[user.role] || [];
+  const menuItems = [
+    { path: "/feed", label: "Feed" },
+    { path: "/profile", label: "My Profile" },
+    { path: "/jobs", label: "Jobs" },
+    { path: "/events", label: "Events" },
+    { path: "/communities", label: "Communities" },
+    { path: "/mentorship", label: "Mentorship" },
+    { path: "/learning", label: "Learning Hub" },
+  ];
+
+  const adminItems = [
+    { path: "/admin/users", label: "User Management" },
+    { path: "/admin/jobs", label: "Jobs Approval" },
+    { path: "/admin/analytics", label: "Analytics Dashboard" },
+  ];
+
+  const isActive = (path) => location.pathname.startsWith(path);
 
   return (
-    <aside className="hidden md:flex md:flex-col w-64 bg-white border-r border-slate-200">
-      <div className="p-4 border-b border-slate-200">
-        <div className="font-bold text-lg">BCET Connect</div>
-        <div className="text-xs text-slate-500">{user.role.toLowerCase()} portal</div>
-      </div>
-      <nav className="flex-1 p-2 space-y-1">
-        {links.map((link) => (
-          <NavLink
-            key={link.to}
-            to={link.to}
-            className={({ isActive }) =>
-              `flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition ${
-                isActive
-                  ? "bg-indigo-100 text-indigo-700 font-medium"
-                  : "text-slate-600 hover:bg-slate-100"
-              }`
-            }
+    <aside className="w-64 min-h-screen bg-blue-900 text-white p-5 shadow-lg">
+      {/* BRAND */}
+      <h2 className="font-bold text-2xl mb-8 tracking-wide">BCET CONNECT</h2>
+
+      {/* USER INFO */}
+      {user && (
+        <div className="mb-6">
+          <p className="font-semibold">{user.name}</p>
+          <p className="text-gray-300 text-sm capitalize">{user.role}</p>
+        </div>
+      )}
+
+      {/* MAIN MENU */}
+      <nav className="space-y-2">
+        {menuItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            className={`block px-4 py-2 rounded-md text-sm transition 
+              ${
+                isActive(item.path)
+                  ? "bg-blue-700 font-semibold"
+                  : "hover:bg-blue-800"
+              }`}
           >
-            <span>{link.icon}</span>
-            <span>{link.label}</span>
-          </NavLink>
+            {item.label}
+          </Link>
         ))}
       </nav>
+
+      {/* ADMIN MENU */}
+      {user?.role === "admin" && (
+        <>
+          <h3 className="text-xs uppercase text-gray-400 mt-8 mb-2">
+            Admin Panel
+          </h3>
+
+          <nav className="space-y-2">
+            {adminItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`block px-4 py-2 rounded-md text-sm transition 
+                ${
+                  isActive(item.path)
+                    ? "bg-orange-700 font-semibold"
+                    : "hover:bg-orange-800"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </>
+      )}
     </aside>
   );
-};
-
-export default Sidebar;
+}

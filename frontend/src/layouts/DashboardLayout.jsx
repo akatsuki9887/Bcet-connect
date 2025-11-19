@@ -1,21 +1,15 @@
-import React from "react";
-import { Outlet } from "react-router-dom";
+import Sidebar from "../components/layout/Sidebar";
+import TopNavbar from "../components/layout/TopNavbar";
 
-const AuthLayout = () => {
+export default function DashboardLayout({ children }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-6">
-        {/* Logo / Tagline */}
-        <div className="text-2xl font-bold text-center mb-4">
-          BCET Connect
-        </div>
-        <div className="text-xs text-center text-slate-500 mb-6">
-          Campus & Alumni Engagement Platform
-        </div>
-        <Outlet />
+    <div className="flex min-h-screen">
+      <Sidebar />
+
+      <div className="flex-1 flex flex-col">
+        <TopNavbar />
+        <main className="flex-1 p-4 bg-gray-50">{children}</main>
       </div>
     </div>
   );
-};
-
-export default AuthLayout;
+}

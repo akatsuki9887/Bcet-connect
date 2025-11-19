@@ -1,24 +1,17 @@
-import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx";
-import AccessDenied from "./AccessDenied.jsx";
-import LoadingSpinner from "./LoadingSpinner.jsx";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import LoadingSpinner from "./LoadingSpinner";
 
-const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user, loading } = useAuth();
-  const location = useLocation();
+export default function ProtectedRoute({ children }) {
+  const { token, loading } = useAuth();
 
-  if (loading) return <LoadingSpinner />;
-
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  if (loading) {
+    return <LoadingSpinner />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <AccessDenied />;
+  if (!token) {
+    return <Navigate to="/login" replace />;
   }
 
   return children;
-};
-
-export default ProtectedRoute;
+}

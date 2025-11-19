@@ -1,30 +1,25 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "../../../services/apiClient";
 
-// TODO: Replace with real API
-const upcomingEvents = [
-  { id: 1, title: "Hackathon 2025", date: "25 Nov 2025" },
-  { id: 2, title: "Guest Lecture on AI", date: "30 Nov 2025" },
-  { id: 3, title: "Alumni Meetup", date: "05 Dec 2025" },
-];
+export default function UpcomingEventsWidget() {
+  const [events, setEvents] = useState([]);
 
-const UpcomingEventsWidget = () => {
+  useEffect(() => {
+    api.get("/events").then((res) => {
+      setEvents(res.data.data.slice(0, 3)); // show only 3
+    });
+  }, []);
+
   return (
-    <div className="bg-indigo-50 rounded-2xl p-4">
-      <h4 className="text-sm font-semibold mb-2">Upcoming Events</h4>
-      <ul className="space-y-2 text-xs text-slate-700">
-        {upcomingEvents.map((event) => (
-          <li key={event.id} className="flex justify-between items-center">
-            <span>{event.title}</span>
-            <span className="text-[10px] text-slate-500">{event.date}</span>
-            <Link to={`/events/${event.id}`} className="text-indigo-600 hover:underline text-[10px]">
-              View
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <div className="p-4 border rounded bg-white shadow">
+      <h3 className="font-bold mb-2">Upcoming Events</h3>
+
+      {events.map((e) => (
+        <div key={e._id} className="mb-3">
+          <p className="font-semibold">{e.title}</p>
+          <p className="text-xs text-gray-600">{e.date}</p>
+        </div>
+      ))}
     </div>
   );
-};
-
-export default UpcomingEventsWidget;
+}

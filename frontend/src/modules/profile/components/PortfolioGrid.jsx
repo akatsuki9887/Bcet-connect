@@ -1,33 +1,40 @@
-import React from "react";
-
-const PortfolioGrid = ({ projects }) => {
-  if (!projects || projects.length === 0) return null;
-
+export default function PortfolioGrid({ items = [] }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
-      <h3 className="text-sm font-semibold text-slate-700 mb-3">Portfolio</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {projects.map((proj, idx) => (
-          <a
-            key={idx}
-            href={proj.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="border rounded-lg overflow-hidden hover:shadow-md transition"
-          >
-            <img
-              src={proj.image || "/placeholder.png"}
-              alt={proj.title}
-              className="w-full h-32 object-cover"
-            />
-            <div className="p-2 text-xs font-semibold text-slate-800">
-              {proj.title}
+    <div className="p-4 border rounded bg-white shadow">
+      <h3 className="font-semibold mb-3">Portfolio</h3>
+
+      <div className="grid grid-cols-3 gap-4">
+        {items.length > 0 ? (
+          items.map((item, index) => (
+            <div key={index} className="border p-3 rounded shadow">
+              {item.image && (
+                <img
+                  src={item.image}
+                  className="w-full h-32 object-cover rounded"
+                  alt="project"
+                />
+              )}
+              <h4 className="font-bold mt-2">{item.title}</h4>
+
+              {item.link && (
+                <a
+                  href={item.link}
+                  target="_blank"
+                  className="text-blue-600 text-sm underline"
+                >
+                  View Project
+                </a>
+              )}
+
+              {item.description && (
+                <p className="text-sm mt-1">{item.description}</p>
+              )}
             </div>
-          </a>
-        ))}
+          ))
+        ) : (
+          <p>No portfolio items added</p>
+        )}
       </div>
     </div>
   );
-};
-
-export default PortfolioGrid;
+}

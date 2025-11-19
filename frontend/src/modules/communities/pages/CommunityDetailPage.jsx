@@ -1,43 +1,36 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import api from "../../../services/apiClient";
 import { useParams } from "react-router-dom";
-import ChannelSidebar from "../components/ChannelSidebar.jsx";
-import CommunityFeed from "../components/CommunityFeed.jsx";
-import CommunityMembers from "../components/CommunityMembers.jsx";
+import ChannelSidebar from "../components/ChannelSidebar";
+import CommunityFeed from "../components/CommunityFeed";
+import CommunityMembers from "../components/CommunityMembers";
 
-// TODO: Replace with API
-const dummyCommunity = {
-  id: 1,
-  name: "Coding Club",
-  description: "All about coding!",
-};
+export default function CommunityDetailPage() {
+  const { id } = useParams();
+  const [community, setCommunity] = useState(null);
 
-const CommunityDetailPage = () => {
-  const { communityId } = useParams();
-  const [community, setCommunity] = useState(dummyCommunity);
-  const [selectedChannel, setSelectedChannel] = useState("General");
+  const loadCommunity = () => {
+    api.get(`/communities/${id}`).then((res) => {
+      setCommunity(res.data.data);
+    });
+  };
 
   useEffect(() => {
-    // TODO: Fetch community details from API
-  }, [communityId]);
+    loadCommunity();
+  }, [id]);
+
+  if (!community) return <p>Loading...</p>;
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4">
-      {/* CHANNELS SIDEBAR */}
-      <ChannelSidebar selectedChannel={selectedChannel} setSelectedChannel={setSelectedChannel} />
+    <div className="flex gap-6 p-4">
+      {/* LEFT → Channels */}
+      <ChannelSidebar channels={community.channels} />
 
-      {/* MAIN FEED */}
-      <main className="flex-1 space-y-4">
-        <h2 className="text-lg font-semibold text-slate-800">{community.name}</h2>
-        <p className="text-sm text-slate-500 mb-4">{community.description}</p>
-        <CommunityFeed />
-      </main>
+      {/* CENTER → Feed */}
+      <CommunityFeed community={community} reload={loadCommunity} />
 
-      {/* MEMBERS SIDEBAR */}
-      <aside className="hidden lg:block w-64">
-        <CommunityMembers />
-      </aside>
+      {/* RIGHT → Members */}
+      <CommunityMembers members={community.members} />
     </div>
   );
-};
-
-export default CommunityDetailPage;
+}

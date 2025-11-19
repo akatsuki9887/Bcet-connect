@@ -1,28 +1,14 @@
-import React from "react";
-
-// TODO: Replace with API
-const dummyMembers = [
-  { id: 1, name: "Alumni A" },
-  { id: 2, name: "Student B" },
-  { id: 3, name: "Faculty C" },
-];
-
-const CommunityMembers = () => {
+export default function CommunityMembers({ members }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-3">
-      <h4 className="text-sm font-semibold mb-2">Members</h4>
-      <ul className="space-y-1 text-xs">
-        {dummyMembers.map((member) => (
-          <li key={member.id} className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-[10px]">
-              {member.name[0]}
-            </div>
-            <span>{member.name}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
+    <aside className="w-64 p-4 bg-white border rounded shadow">
+      <h3 className="font-bold mb-3">Members</h3>
 
-export default CommunityMembers;
+      {members.map((m) => (
+        <div key={m._id} className="border-b p-2">
+          <p className="font-semibold">{m.name}</p>
+          <p className="text-sm text-gray-500 capitalize">{m.role}</p>
+        </div>
+      ))}
+    </aside>
+  );
+}

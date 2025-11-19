@@ -1,81 +1,174 @@
-import React, { useState } from "react";
-import { useAuth } from "../../../context/AuthContext.jsx";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../../services/apiClient";
+import { useAuth } from "../../../context/AuthContext";
 
-const JobCreatePage = () => {
+export default function JobCreatePage() {
   const { user } = useAuth();
-  const [title, setTitle] = useState("");
-  const [company, setCompany] = useState("");
-  const [location, setLocation] = useState("");
-  const [type, setType] = useState("Full-Time");
-  const [description, setDescription] = useState("");
+  const navigate = useNavigate();
+
+  // Agar user student hai → restrict
+  if (user?.role === "student") {
+    return (
+      <div className="max-w-xl mx-auto p-6">
+        <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
+        <p className="text-gray-600">
+          Only alumni, faculty, or admin can post jobs.
+        </p>
+      </div>
+    );
+  }
+
+  const [form, setForm] = useState({
+    title: "",
+    company: "",
+    location: "",
+    employmentType: "Full-Time",
+    description: "",
+    skills: "",
+  });
+
   const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      // TODO: await jobsApi.createJob({ title, company, location, type, description, createdBy: user.id });
-      console.log("Job created:", { title, company, location, type, description });
-      setTitle(""); setCompany(""); setLocation(""); setType("Full-Time"); setDescription("");
+      // skills string ko array me convert karo
+      const payload = {
+        ...form,
+        skills: form.skills
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
+      };
+
+      await api.post("/jobs", payload);
+
+      alert("Job posted successfully ✅");
+      navigate("/jobs");
     } catch (err) {
-      console.error("Error creating job:", err);
+      console.error(err);
+      alert("Failed to post job. Check console for details.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-lg mx-auto">
-      <h2 className="text-lg font-semibold mb-4">Create New Job</h2>
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input
-          type="text"
-          placeholder="Job Title"
-          className="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Company"
-          className="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm"
-          value={company}
-          onChange={(e) => setCompany(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Location"
-          className="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-        />
-        <select
-          className="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-        >
-          <option>Full-Time</option>
-          <option>Part-Time</option>
-          <option>Internship</option>
-          <option>Remote</option>
-        </select>
-        <textarea
-          rows={4}
-          placeholder="Job Description"
-          className="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm resize-none"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+    <div className="max-w-2xl mx-auto p-6 bg-white border rounded shadow">
+      <h1 className="text-2xl font-bold mb-6">Post a New Job</h1>
+
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        {/* Job Title */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Job Title</label>
+          <input
+            type="text"
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+            required
+            className="w-full border rounded px-3 py-2"
+            placeholder="e.g. Software Engineer Intern"
+          />
+        </div>
+
+        {/* Company */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Company</label>
+          <input
+            type="text"
+            name="company"
+            value={form.company}
+            onChange={handleChange}
+            required
+            className="w-full border rounded px-3 py-2"
+            placeholder="e.g. Google, TCS, Infosys"
+          />
+        </div>
+
+        {/* Location */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Location</label>
+          <input
+            type="text"
+            name="location"
+            value={form.location}
+            onChange={handleChange}
+            required
+            className="w-full border rounded px-3 py-2"
+            placeholder="e.g. Bangalore / Remote"
+          />
+        </div>
+
+        {/* Employment Type */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Employment Type
+          </label>
+          <select
+            name="employmentType"
+            value={form.employmentType}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+          >
+            <option>Full-Time</option>
+            <option>Internship</option>
+            <option>Part-Time</option>
+            <option>Remote</option>
+          </select>
+        </div>
+
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Description</label>
+          <textarea
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            required
+            rows={5}
+            className="w-full border rounded px-3 py-2"
+            placeholder="Describe the role, responsibilities, and requirements..."
+          />
+        </div>
+
+        {/* Skills */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Required Skills (comma separated)
+          </label>
+          <input
+            type="text"
+            name="skills"
+            value={form.skills}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+            placeholder="e.g. React, Node.js, MongoDB"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Example: <code>React, Node.js, MongoDB</code>
+          </p>
+        </div>
+
+        {/* Submit */}
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-1.5 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50"
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
         >
-          {loading ? "Creating..." : "Create Job"}
+          {loading ? "Posting..." : "Post Job"}
         </button>
       </form>
     </div>
   );
-};
-
-export default JobCreatePage;
+}

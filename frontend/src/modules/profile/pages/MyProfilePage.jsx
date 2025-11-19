@@ -1,27 +1,31 @@
-import React, { useEffect, useState } from "react";
-import { useAuth } from "../../../context/AuthContext.jsx";
-import ProfileHeader from "../components/ProfileHeader.jsx";
-import SkillsSection from "../components/SkillsSection.jsx";
-import PortfolioGrid from "../components/PortfolioGrid.jsx";
+import { useEffect, useState } from "react";
+import axios from "../../../services/apiClient";
+import ProfileHeader from "../components/ProfileHeader";
+import SkillsSection from "../components/SkillsSection";
+import PortfolioGrid from "../components/PortfolioGrid";
 
-const MyProfilePage = () => {
-  const { user } = useAuth();
+export default function MyProfilePage() {
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    // TODO: Fetch profile from API
-    setProfile(user); // temp placeholder
-  }, [user]);
+    axios.get("/user/me")
+      .then((res) => {
+        setProfile(res.data.data);
+      })
+      .catch((err) => {
+        console.error("Profile fetch error:", err);
+      });
+  }, []);
 
-  if (!profile) return <p className="text-slate-500">Loading profile...</p>;
+  if (!profile) return <p className="p-4">Loading Profile...</p>;
 
   return (
-    <div className="space-y-4">
-      <ProfileHeader user={profile} />
+    <div className="space-y-6 p-4">
+      <ProfileHeader profile={profile} />
+
       <SkillsSection skills={profile.skills} />
-      <PortfolioGrid projects={profile.projects} />
+
+      <PortfolioGrid items={profile.portfolio} />
     </div>
   );
-};
-
-export default MyProfilePage;
+}

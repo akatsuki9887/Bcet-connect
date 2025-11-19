@@ -1,47 +1,45 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import api from "../../../services/apiClient";
 
-// TODO: Replace with API
-const dummyEvent = {
-  id: 1,
-  title: "Hackathon 2025",
-  date: "25 Nov 2025",
-  time: "10:00 AM",
-  description: "24-hour coding competition for students.",
-  location: "Main Campus Auditorium",
-  organizer: "BCET Coding Club",
-  attendees: 120,
-  status: "Upcoming"
-};
-
-const EventDetailPage = () => {
-  const { eventId } = useParams();
-  const [event, setEvent] = useState(dummyEvent);
+export default function EventDetailPage() {
+  const { id } = useParams();
+  const [event, setEvent] = useState(null);
 
   useEffect(() => {
-    // TODO: Fetch event detail by eventId from API
-  }, [eventId]);
+    api.get(`/events/${id}`).then((res) => {
+      setEvent(res.data.data);
+    });
+  }, [id]);
+
+  if (!event) return <p>Loading...</p>;
+
+  const handleRegister = () => {
+    api.post(`/events/${id}/register`);
+    alert("Registered for event!");
+  };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-      <h2 className="text-lg font-semibold text-slate-800">{event.title}</h2>
-      <p className="text-sm text-slate-500">{event.date} | {event.time}</p>
-      <p className="text-sm text-slate-500">Location: {event.location}</p>
-      <p className="text-sm text-slate-500">Organizer: {event.organizer}</p>
-      <p className="text-sm text-slate-500">Attendees: {event.attendees}</p>
-      <p className="text-sm text-slate-700">{event.description}</p>
+    <div className="max-w-3xl mx-auto space-y-4 p-4">
+      {event.banner && (
+        <img src={event.banner} className="w-full h-60 rounded object-cover" />
+      )}
 
-      {/* CTA Buttons */}
-      <div className="flex gap-2 mt-4">
-        <button className="px-4 py-1 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 text-sm">
-          Register
-        </button>
-        <button className="px-4 py-1 rounded-full border border-slate-300 hover:bg-slate-100 text-sm">
-          Share
-        </button>
+      <h1 className="text-3xl font-bold">{event.title}</h1>
+      <p className="text-gray-700">{event.description}</p>
+
+      <div className="text-sm mt-3 text-gray-500">
+        {event.date} • {event.time}
       </div>
+
+      <p className="text-gray-600 mt-2">{event.location}</p>
+
+      <button
+        onClick={handleRegister}
+        className="mt-4 px-5 py-2 bg-blue-600 text-white rounded"
+      >
+        Register Now
+      </button>
     </div>
   );
-};
-
-export default EventDetailPage;
+}

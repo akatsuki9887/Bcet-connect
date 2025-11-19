@@ -1,27 +1,41 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import AuthForm from "../components/AuthForm.jsx";
-import { useAuth } from "../../../context/AuthContext.jsx";
+import AuthForm from "../components/AuthForm";
+import api from "../../../services/apiClient";
 
-const RegisterPage = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+export default function RegisterPage() {
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
 
-  useEffect(() => {
-    if (user) navigate("/feed", { replace: true });
-  }, [user]);
+    const name = data.get("name");
+    const email = data.get("email");
+    const password = data.get("password");
+
+    try {
+      await api.post("/auth/register", {
+        name,
+        email,
+        password,
+        role: "student", // later role select dropdown se bhi le sakte ho
+      });
+
+      alert("Registered successfully! Now login.");
+    } catch (err) {
+      alert(
+        err?.response?.data?.message ||
+          "Registration failed, maybe email already used"
+      );
+    }
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-100 px-4">
-      <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-lg">
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold">Create Account</h1>
-          <p className="text-sm text-slate-500">Sign up for BCET Connect</p>
-        </div>
-        <AuthForm type="register" />
-      </div>
-    </div>
+    <AuthForm
+      title="Register"
+      onSubmit={handleRegister}
+      fields={[
+        { name: "name", type: "text", placeholder: "Your name" },
+        { name: "email", type: "email", placeholder: "Email" },
+        { name: "password", type: "password", placeholder: "Password" },
+      ]}
+    />
   );
-};
-
-export default RegisterPage;
+}

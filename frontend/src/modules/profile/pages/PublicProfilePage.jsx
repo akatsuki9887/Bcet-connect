@@ -1,52 +1,27 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "../../../services/apiClient";
 import { useParams } from "react-router-dom";
-import ProfileHeader from "../components/ProfileHeader.jsx";
-import SkillsSection from "../components/SkillsSection.jsx";
-import PortfolioGrid from "../components/PortfolioGrid.jsx";
+import ProfileHeader from "../components/ProfileHeader";
 
-// TODO: Replace with API call
-const dummyProfiles = [
-  {
-    id: "1",
-    name: "Alumni A",
-    role: "ALUMNI",
-    department: "Computer Science",
-    bio: "Full-stack Developer",
-    skills: ["React", "Node.js", "MongoDB"],
-    projects: [
-      { title: "Portfolio Website", link: "#", image: "/placeholder.png" },
-      { title: "React App", link: "#", image: "/placeholder.png" },
-    ],
-  },
-  {
-    id: "2",
-    name: "Student B",
-    role: "STUDENT",
-    department: "Electronics",
-    skills: ["Python", "DSA"],
-    projects: [],
-  },
-];
-
-const PublicProfilePage = () => {
+export default function PublicProfilePage() {
   const { userId } = useParams();
   const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    // TODO: Fetch public profile via API
-    const found = dummyProfiles.find((p) => p.id === userId);
-    setProfile(found || null);
+    axios.get(`/user/${userId}`)
+      .then((res) => {
+        setProfile(res.data.data);
+      })
+      .catch((err) => {
+        console.error("Public profile fetch error:", err);
+      });
   }, [userId]);
 
-  if (!profile) return <p className="text-slate-500">Profile not found</p>;
+  if (!profile) return <p className="p-4">Loading Profile...</p>;
 
   return (
-    <div className="space-y-4">
-      <ProfileHeader user={profile} />
-      <SkillsSection skills={profile.skills} />
-      <PortfolioGrid projects={profile.projects} />
+    <div className="p-4">
+      <ProfileHeader profile={profile} />
     </div>
   );
-};
-
-export default PublicProfilePage;
+}

@@ -1,134 +1,243 @@
-import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
-// Layouts
-import AuthLayout from "../layouts/AuthLayout.jsx";
-import DashboardLayout from "../layouts/DashboardLayout.jsx";
+// AUTH
+import LoginPage from "../modules/auth/pages/LoginPage";
+import RegisterPage from "../modules/auth/pages/RegisterPage";
 
-// Auth Pages
-import LoginPage from "../modules/auth/pages/LoginPage.jsx";
-import RegisterPage from "../modules/auth/pages/RegisterPage.jsx";
+// PROFILE
+import MyProfilePage from "../modules/profile/pages/MyProfilePage";
+import PublicProfilePage from "../modules/profile/pages/PublicProfilePage";
 
-// Feed Module
-import FeedPage from "../modules/feed/pages/FeedPage.jsx";
+// FEED
+import FeedPage from "../modules/feed/pages/FeedPage";
 
-// Jobs Module
-import JobsListPage from "../modules/jobs/pages/JobsListPage.jsx";
-import JobDetailPage from "../modules/jobs/pages/JobDetailPage.jsx";
-import JobCreatePage from "../modules/jobs/pages/JobCreatePage.jsx";
+// JOBS
+import JobsListPage from "../modules/jobs/pages/JobsListPage";
+import JobDetailPage from "../modules/jobs/pages/JobDetailPage";
+import JobCreatePage from "../modules/jobs/pages/JobCreatePage";
 
-// Mentorship Module
-import MentorsPage from "../modules/mentorship/pages/MentorsPage.jsx";
-import MentorshipChatPage from "../modules/mentorship/pages/MentorshipChatPage.jsx";
+// EVENTS
+import EventsListPage from "../modules/events/pages/EventsListPage";
+import EventDetailPage from "../modules/events/pages/EventDetailPage";
+import EventCreatePage from "../modules/events/pages/EventCreatePage";
 
-// Events Module
-import EventsListPage from "../modules/events/pages/EventsListPage.jsx";
-import EventDetailPage from "../modules/events/pages/EventDetailPage.jsx";
+// COMMUNITIES
+import CommunitiesListPage from "../modules/communities/pages/CommunitiesListPage";
+import CommunityDetailPage from "../modules/communities/pages/CommunityDetailPage";
+import CommunityCreatePage from "../modules/communities/pages/CommunityCreatePage";
 
-// Communities Module
-import CommunitiesListPage from "../modules/communities/pages/CommunitiesListPage.jsx";
-import CommunityDetailPage from "../modules/communities/pages/CommunityDetailPage.jsx";
+// MENTORSHIP
+import MentorsPage from "../modules/mentorship/pages/MentorsPage";
+import MentorshipChatPage from "../modules/mentorship/pages/MentorshipChatPage";
 
-// Learning Hub Module
-import LearningHubPage from "../modules/learning/pages/LearningHubPage.jsx";
+// LAYOUTS & AUTH
+import ProtectedRoute from "../components/common/ProtectedRoute";
+import DashboardLayout from "../layouts/DashboardLayout";
 
-// Directory Module
-import DirectoryPage from "../modules/directory/pages/DirectoryPage.jsx";
-
-// Profile Module
-import MyProfilePage from "../modules/profile/pages/MyProfilePage.jsx";
-import PublicProfilePage from "../modules/profile/pages/PublicProfilePage.jsx";
-
-// Admin Module
-import AdminDashboardPage from "../modules/admin/pages/AdminDashboardPage.jsx";
-import UsersManagementPage from "../modules/admin/pages/UsersManagementPage.jsx";
-import JobsApprovalPage from "../modules/admin/pages/JobsApprovalPage.jsx";
-
-// Common Components
-import ProtectedRoute from "../components/common/ProtectedRoute.jsx";
-import NotFound from "../components/common/NotFound.jsx";
-
-const AppRoutes = () => {
+export default function AppRoutes() {
   return (
     <Routes>
-      {/* AUTH ROUTES */}
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Route>
 
-      {/* MAIN DASHBOARD */}
+      {/* ================= PUBLIC AUTH ROUTES ================= */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+
+      {/* DEFAULT → FEED */}
+      <Route path="/" element={<Navigate to="/feed" replace />} />
+
+
+      {/* ================= PROTECTED CORE APP ROUTES ================= */}
+
+      {/* 🌍 FEED */}
       <Route
-        path="/"
+        path="/feed"
         element={
           <ProtectedRoute>
-            <DashboardLayout />
+            <DashboardLayout>
+              <FeedPage />
+            </DashboardLayout>
           </ProtectedRoute>
         }
-      >
-        {/* Default redirect */}
-        <Route index element={<Navigate to="/feed" replace />} />
+      />
 
-        {/* COMMON MODULES */}
-        <Route path="feed" element={<FeedPage />} />
 
-        <Route path="jobs" element={<JobsListPage />} />
-        <Route path="jobs/:jobId" element={<JobDetailPage />} />
-        <Route
-          path="jobs/new"
-          element={
-            <ProtectedRoute allowedRoles={["ALUMNI", "FACULTY", "ADMIN"]}>
+      {/* ================= PROFILE ROUTES ================= */}
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <MyProfilePage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/profile/:userId"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <PublicProfilePage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+
+      {/* ================= JOBS MODULE ROUTES ================= */}
+      <Route
+        path="/jobs"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <JobsListPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/jobs/:id"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <JobDetailPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/jobs/create"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
               <JobCreatePage />
-            </ProtectedRoute>
-          }
-        />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
 
-        <Route path="mentors" element={<MentorsPage />} />
-        <Route path="mentorship/:mentorId" element={<MentorshipChatPage />} />
 
-        <Route path="events" element={<EventsListPage />} />
-        <Route path="events/:eventId" element={<EventDetailPage />} />
+      {/* ================= EVENTS MODULE ROUTES ================= */}
+      <Route
+        path="/events"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <EventsListPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
 
-        <Route path="communities" element={<CommunitiesListPage />} />
-        <Route path="communities/:communityId" element={<CommunityDetailPage />} />
+      <Route
+        path="/events/:id"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <EventDetailPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
 
-        <Route path="learning" element={<LearningHubPage />} />
-        <Route path="directory" element={<DirectoryPage />} />
+      <Route
+        path="/events/create"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <EventCreatePage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
 
-        <Route path="profile/me" element={<MyProfilePage />} />
-        <Route path="profile/:userId" element={<PublicProfilePage />} />
 
-        {/* ADMIN MODULE */}
-        <Route
-          path="admin"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <AdminDashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="admin/users"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <UsersManagementPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="admin/jobs"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <JobsApprovalPage />
-            </ProtectedRoute>
-          }
-        />
-      </Route>
+      {/* ================= COMMUNITIES MODULE ROUTES ================= */}
+      <Route
+        path="/communities"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <CommunitiesListPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
 
-      {/* 404 */}
-      <Route path="*" element={<NotFound />} />
+      <Route
+        path="/communities/:id"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <CommunityDetailPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/communities/create"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <CommunityCreatePage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+
+      {/* ================= MENTORSHIP MODULE ROUTES ================= */}
+      <Route
+        path="/mentors"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <MentorsPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* CHAT WITH MENTOR */}
+      <Route
+        path="/mentors/chat/:id"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <MentorshipChatPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+
+      {/* ================= OPTIONAL DASHBOARD PAGE ================= */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <h1 className="text-2xl font-bold">Dashboard Overview</h1>
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+
+      {/* ================= 404 ROUTE ================= */}
+      <Route
+        path="*"
+        element={
+          <h1 className="p-6 text-center text-xl font-bold">
+            404 | Page Not Found
+          </h1>
+        }
+      />
+
     </Routes>
   );
-};
-
-export default AppRoutes;
+}

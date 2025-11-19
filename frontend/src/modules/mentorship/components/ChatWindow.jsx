@@ -1,63 +1,53 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState } from "react";
+import api from "../../../services/apiClient";
 
-// TODO: Replace with real WebSocket / Firebase chat
-const dummyMessages = [
-  { id: 1, sender: "MENTOR", text: "Hi! How can I help you today?" },
-  { id: 2, sender: "STUDENT", text: "I need guidance on React projects." },
-];
+export default function ChatWindow({ messages, reload, mentorId }) {
+  const [text, setText] = useState("");
 
-const ChatWindow = ({ mentor }) => {
-  const [messages, setMessages] = useState(dummyMessages);
-  const [newMessage, setNewMessage] = useState("");
-  const messagesEndRef = useRef(null);
+  const sendMessage = async () => {
+    if (!text.trim()) return;
 
-  const handleSend = () => {
-    if (!newMessage.trim()) return;
-    setMessages([...messages, { id: Date.now(), sender: "STUDENT", text: newMessage }]);
-    setNewMessage("");
+    await api.post(`/mentorship/chat/${mentorId}`, { text });
+    setText("");
+    reload();
   };
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
   return (
-    <div className="flex flex-col h-full border border-slate-200 rounded-2xl overflow-hidden">
-      <header className="p-3 bg-indigo-50 border-b border-slate-200 font-semibold text-sm">
-        Chat with {mentor.name}
-      </header>
-      <div className="flex-1 p-3 overflow-y-auto space-y-2">
+    <div className="space-y-4">
+
+      {/* CHAT MESSAGES */}
+      <div className="h-80 overflow-y-auto border p-3 rounded bg-white shadow space-y-3">
         {messages.map((msg) => (
           <div
-            key={msg.id}
-            className={`max-w-xs p-2 rounded-xl text-sm ${
-              msg.sender === "STUDENT"
-                ? "bg-indigo-600 text-white self-end"
-                : "bg-slate-200 text-slate-800 self-start"
+            key={msg._id}
+            className={`p-2 rounded ${
+              msg.sender?._id === mentorId
+                ? "bg-gray-200 text-black"
+                : "bg-blue-500 text-white"
             }`}
           >
-            {msg.text}
+            <p className="text-sm font-semibold">{msg.sender?.name}</p>
+            <p>{msg.text}</p>
           </div>
         ))}
-        <div ref={messagesEndRef} />
       </div>
-      <div className="p-3 border-t border-slate-200 flex gap-2">
+
+      {/* INPUT BOX */}
+      <div className="flex gap-3">
         <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-1 border border-slate-300 rounded-full px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="flex-1 border p-2 rounded"
+          placeholder="Type message..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
         />
+
         <button
-          onClick={handleSend}
-          className="px-4 py-1 rounded-full bg-indigo-600 text-white hover:bg-indigo-700 text-sm"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+          onClick={sendMessage}
         >
           Send
         </button>
       </div>
     </div>
   );
-};
-
-export default ChatWindow;
+}

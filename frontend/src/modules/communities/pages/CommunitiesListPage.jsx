@@ -1,32 +1,23 @@
-import React, { useEffect, useState } from "react";
-import CommunityCard from "../components/CommunityCard.jsx";
+import { useEffect, useState } from "react";
+import api from "../../../services/apiClient";
+import CommunityCard from "../components/CommunityCard";
 
-// TODO: Replace with API
-const dummyCommunities = [
-  { id: 1, name: "Coding Club", description: "All about coding!", membersCount: 120 },
-  { id: 2, name: "AI & ML", description: "AI discussions and projects", membersCount: 85 },
-  { id: 3, name: "Design Hub", description: "UI/UX enthusiasts", membersCount: 60 },
-];
-
-const CommunitiesListPage = () => {
-  const [communities, setCommunities] = useState(dummyCommunities);
+export default function CommunitiesListPage() {
+  const [communities, setCommunities] = useState([]);
 
   useEffect(() => {
-    // TODO: Fetch communities from API
+    api.get("/communities").then((res) => {
+      setCommunities(res.data.data);
+    });
   }, []);
 
   return (
-    <div className="space-y-4">
-      {communities.map((community) => (
-        <CommunityCard key={community.id} community={community} />
+    <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <h1 className="text-3xl font-bold">Communities</h1>
+
+      {communities.map((c) => (
+        <CommunityCard key={c._id} community={c} />
       ))}
-      {communities.length === 0 && (
-        <div className="text-center text-slate-500 py-6">
-          No communities found
-        </div>
-      )}
     </div>
   );
-};
-
-export default CommunitiesListPage;
+}

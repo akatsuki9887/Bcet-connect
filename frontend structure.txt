@@ -68,6 +68,7 @@ frontend/
           ChatWindow.jsx
       events/
         pages/
+          EventCreatePage.jsx
           EventsListPage.jsx
           EventDetailPage.jsx
         components/

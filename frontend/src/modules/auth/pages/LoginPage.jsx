@@ -1,29 +1,34 @@
-import React, { useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import AuthForm from "../components/AuthForm.jsx";
-import { useAuth } from "../../../context/AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
+import AuthForm from "../components/AuthForm";
+import { useAuth } from "../../../context/AuthContext";
 
-const LoginPage = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || "/feed";
+export default function LoginPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate(); // <---- Add this
 
-  useEffect(() => {
-    if (user) navigate(from, { replace: true });
-  }, [user]);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+
+    const email = data.get("email");
+    const password = data.get("password");
+
+    try {
+      await login(email, password);
+      navigate("/dashboard"); // <---- Redirect here!
+    } catch (err) {
+      alert("Login failed");
+    }
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-100 px-4">
-      <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-lg">
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold">Welcome Back</h1>
-          <p className="text-sm text-slate-500">Login to your BCET Connect account</p>
-        </div>
-        <AuthForm type="login" />
-      </div>
-    </div>
+    <AuthForm
+      title="Login"
+      onSubmit={handleLogin}
+      fields={[
+        { name: "email", type: "email", placeholder: "Enter email" },
+        { name: "password", type: "password", placeholder: "Enter password" },
+      ]}
+    />
   );
-};
-
-export default LoginPage;
+}
