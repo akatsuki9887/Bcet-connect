@@ -1,0 +1,11 @@
+# Ignore dependency folders
+backend/node_modules/
+frontend/node_modules/
+
+# Global environment
+*.env
+*.env.*
+
+# System files
+.DS_Store
+Thumbs.db
